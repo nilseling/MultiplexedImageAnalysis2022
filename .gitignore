@@ -1,2 +1,6 @@
 data/*.zip
 *.DS_Store
+*.tiff
+*.csv
+*.sh
+data/sample_metadata.xlsx

@@ -19,6 +19,8 @@ install.packages("BiocManager")
 BiocManager::install(c("cytomapper", "imcRtools"))
 ```
 
+Please also install [FIJI](https://imagej.net/software/fiji/) and [QuPATH](https://qupath.github.io/).
+
 ## Download example data {#download-data}
 
 To highlight the basic steps of multiplexed image analysis, we provide example data that
@@ -51,7 +53,7 @@ channel metadata. All these files will be downloaded here for easy access. The
 commands which were used to process the data can be found in
 `data/steinbock/steinbock.sh`.
 
-```{r steinbock-results}
+```{r steinbock-results, warning=FALSE}
 # download intensities
 url <- "https://zenodo.org/record/6043600/files/intensities.zip"
 destfile <- "data/steinbock/intensities.zip"
@@ -96,6 +98,16 @@ download.file("https://zenodo.org/record/6043600/files/images.csv",
 download.file("https://zenodo.org/record/6043600/files/steinbock.sh", 
               "data/steinbock/steinbock.sh")
 ```
+
+## Visualization of multiplexed images
+
+FIJI and QuPATH
+
+## Handling image and single-cell data in R
+
+## Single-cell analysis
+
+## Image visualization
 
 
 

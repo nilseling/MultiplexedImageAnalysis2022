@@ -469,7 +469,7 @@ cluster_annot <- as.numeric(cluster)
 cluster_annot[cluster_annot == 1] <- "Tumor_proliferating"
 cluster_annot[cluster_annot == 2] <- "Stroma"
 cluster_annot[cluster_annot == 3] <- "Tumor_proliferating"
-cluster_annot[cluster_annot == 4] <- "Macrophages"
+cluster_annot[cluster_annot == 4] <- "Stroma"
 cluster_annot[cluster_annot == 5] <- "CD38"
 cluster_annot[cluster_annot == 6] <- "Macrophages"
 cluster_annot[cluster_annot == 7] <- "Tumor_hypoxic"
@@ -478,7 +478,7 @@ cluster_annot[cluster_annot == 9] <- "cyto_Tcell"
 cluster_annot[cluster_annot == 10] <- "Stroma"
 cluster_annot[cluster_annot == 11] <- "Tumor"
 cluster_annot[cluster_annot == 12] <- "Tumor_proliferating"
-cluster_annot[cluster_annot == 13] <- "B cells"
+cluster_annot[cluster_annot == 13] <- "B_cells"
 
 spe$cluster_annot <- as.factor(cluster_annot)
 ```
@@ -500,31 +500,91 @@ to the image-level visualization.
 
 ## Image visualization
 
+In the next section, we will visualize some of the images of the dataset.
+For this, we will use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package. 
+We will consistently visualize the four images randomly sampled above.
 
+### Pixel level visualization
 
-```{r overlay-masks, message=FALSE}
-library(cytomapper)
-set.seed(20220118)
-img_ids <- sample(seq_len(length(images)), 3)
+The `cytomapper` package can be used to visualize pixel-level information
+by merging channels and therefore generating image composites that visualize 
+more than one single protein.
 
-# Normalize and clip images
-cur_images <- images[img_ids]
-cur_images <- cytomapper::normalize(cur_images, separateImages = TRUE)
-cur_images <- cytomapper::normalize(cur_images, inputRange = c(0, 0.2))
+In the first example, we will vizualice E-cadherin (tumor cells), Ki67 (proliferation marker),
+CD3 (T cells) and CD20 (B cells) and a nuclear marker.
 
-plotPixels(cur_images,
-           mask = masks[img_ids],
-           img_id = "sample_id",
-           missing_colour = "white",
-           colour_by = c("CD163", "CD20", "CD3", "Ecad", "DNA1"),
-           colour = list(CD163 = c("black", "yellow"),
-                         CD20 = c("black", "red"),
+```{r 5-color-composites, message=FALSE}
+plotPixels(images[cur_img_ids],
+           colour_by = c("Ecad", "Ki67", "CD3", "CD20", "DNA1"),
+           colour = list(Ecad = c("black", "brown"),
+                         Ki67 = c("black", "yellow"),
                          CD3 = c("black", "green"),
-                         Ecad = c("black", "cyan"),
+                         CD20 = c("black", "red"),
                          DNA1 = c("black", "blue")),
-           image_title = NULL,
+           bcg = list(
+               Ecad = c(0, 10, 1),
+               Ki67 = c(0, 10, 1),
+               CD3 = c(0, 10, 1),
+               CD20 = c(0, 15, 1),
+               DNA1 = c(0, 5, 1)
+           ),
            legend = list(colour_by.title.cex = 0.7,
                          colour_by.labels.cex = 0.7))
+```
+
+On these images we can now outline selected cell types. This approach is useful to 
+visualize if the corrected cells were phenotyped. In the following example, 
+T cells are outlined.
+
+```{r outline-t-cells, message=FALSE}
+plotPixels(images[cur_img_ids],
+           mask = masks[cur_img_ids],
+           object = spe[,spe$cluster_annot == "cyto_Tcell"],
+           img_id = "sample_id",
+           cell_id = "ObjectNumber",
+           outline_by = "cluster_annot",
+           missing_colour = "white",
+           thick = TRUE,
+           colour_by = c("Ecad", "Ki67", "CD8a", "CD20", "DNA1"),
+           colour = list(Ecad = c("black", "brown"),
+                         Ki67 = c("black", "yellow"),
+                         CD8a = c("black", "green"),
+                         CD20 = c("black", "red"),
+                         DNA1 = c("black", "blue")),
+           bcg = list(
+               Ecad = c(0, 10, 1),
+               Ki67 = c(0, 10, 1),
+               CD8a = c(0, 10, 1),
+               CD20 = c(0, 15, 1),
+               DNA1 = c(0, 5, 1)
+           ),
+           legend = list(colour_by.title.cex = 0.7,
+                         colour_by.labels.cex = 0.7))
+```
+### Cell level visualization
+
+Next to the pixel-level visualization, the `cytomapper` package provides the 
+`plotCells` function to visualize cell-level metadata on segmentation masks.
+
+Here, we can visualize the defined cell phenotypes on segmentation masks.
+
+```{r visualize-masks}
+plotCells(mask = masks[cur_img_ids],
+          object = spe,
+          img_id = "sample_id",
+          cell_id = "ObjectNumber",
+          colour_by = "cluster_annot")
+```
+
+This sort of visualization is also useful when selecting images that contain
+certain tissue structures:
+
+```{r visualize-masks-2}
+plotCells(mask = masks,
+          object = spe,
+          img_id = "sample_id",
+          cell_id = "ObjectNumber",
+          colour_by = "cluster_annot")
 ```
 
 ## Software used

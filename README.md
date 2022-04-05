@@ -14,6 +14,8 @@ or download the zipped version by clicking on `Code` and then `Download ZIP`.
 
 The `MultiplexedImageAnalysis.Rmd` file contains runnable code to follow the tutorial.
 
+To follow the tutorial online, please refer to [https://nilseling.github.io/MultiplexedImageAnalysis2022/](https://nilseling.github.io/MultiplexedImageAnalysis2022/).
+
 ## Install required packages
 
 Please install [R](https://www.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
